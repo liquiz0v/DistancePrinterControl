@@ -18,10 +18,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="DTO\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\DistancePrinterControl.Database\DistancePrinterControl.Database.csproj" />
       <ProjectReference Include="..\DistancePrinterControl.Logic\DistancePrinterControl.Logic.csproj" />
     </ItemGroup>

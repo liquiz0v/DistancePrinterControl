@@ -6,9 +6,12 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Dapper;
+using DistancePrinterControl.API.Helpers;
+using DistancePrinterControl.Database.Logic.ReadServices.Interfaces;
 using DistancePrinterControl.Database.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,31 +21,37 @@ namespace DistancePrinterControl.API.Controllers
     [Route("[controller]")]
     public class PrinterController : ControllerBase
     {
-        readonly string _connectionString = "Server=.;Database=DistancePrinterControl; Trusted_Connection=True; MultipleActiveResultSets=true";
-        [HttpGet("{printerId}/Version")]
-        // GET
-        public async Task<object> Test()
+        private readonly IPrinterReadService _readService;
+        
+        // TODO: Remove this later, add new field to Printer model, in which will be stored creds or accs
+        private readonly string _printerCreds;
+        public PrinterController(IPrinterReadService readService, ICredsHelper credsHelper)
         {
+            _readService = readService;
+            _printerCreds = credsHelper.AuthToken;
+        }
+        
+        [HttpGet]
+        // GET PRINTERS LIST
+        public List<Printer> GetPrintersAsync()
+        {
+            return _readService.GetPrinters();
+        }
+        
+        [HttpGet("{printerId}/Version")]
+        // GET SERVER VERSION
+        public async Task<object> Test(int printerId)
+        {
+            var printer = _readService.GetPrinter(printerId);
+            
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Authorization
-                = new AuthenticationHeaderValue("Bearer", "4DB690C38FE74C2EB2BF1FC4BEDE3E06");
-            HttpResponseMessage response = await client.GetAsync("http://192.168.1.125:5000/api/version");
+                = new AuthenticationHeaderValue("Bearer", $@"{_printerCreds}");
+            HttpResponseMessage response = await client.GetAsync($"{printer.PrinterUrl}/api/version");
             string responseBody = await response.Content.ReadAsStringAsync();
             return responseBody;
         }
-
-        [HttpGet]
-        // GET
-        public List<Printer> GetPrintersAsync()
-        {
-            var query = $@"select * from Printers;";
-
-            using (IDbConnection db = new SqlConnection(_connectionString))
-            {
-                return db.Query<Printer>(query).ToList();
-            }
-        }
-
+        
         [HttpGet("{printerId}/controls/")]
         public object Controls(int printerId)
         {
