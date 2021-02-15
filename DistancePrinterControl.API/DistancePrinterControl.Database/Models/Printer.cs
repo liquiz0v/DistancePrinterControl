@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DistancePrinterControl.API.Models
+namespace DistancePrinterControl.Database.Models
 {
     public class Printer
     {

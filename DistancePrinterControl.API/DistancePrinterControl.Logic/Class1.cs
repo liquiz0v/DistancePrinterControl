@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DistancePrinterControl.Logic
+namespace DistancePrinterControl.Database.Logic
 {
     public class Class1
     {
