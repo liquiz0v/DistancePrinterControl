@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace DistancePrinterControl.API.Migrations
+namespace DistancePrinterControl.Database.Migrations
 {
     public partial class Init : Migration
     {

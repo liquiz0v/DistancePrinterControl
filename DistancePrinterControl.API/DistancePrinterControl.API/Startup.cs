@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DistancePrinterControl.API.Models;
+using Autofac;
+using DistancePrinterControl.API.configs;
+using DistancePrinterControl.Database.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -38,6 +40,13 @@ namespace DistancePrinterControl.API
                     Configuration.GetConnectionString("DefaultConnection")));
         }
 
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+
+            // Register your own things directly with Autofac, like:
+            builder.RegisterModule(new DistancePrinterControlAutofacConfig());
+        }
+        
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {

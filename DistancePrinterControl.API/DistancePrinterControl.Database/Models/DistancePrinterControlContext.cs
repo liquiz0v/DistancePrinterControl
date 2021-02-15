@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace DistancePrinterControl.API.Models
+namespace DistancePrinterControl.Database.Models
 {
     public class DistancePrinterControlContext : DbContext
     {
@@ -21,6 +21,11 @@ namespace DistancePrinterControl.API.Models
             modelBuilder.Entity<Printer>().HasData(
                 new {Id = 1, PrinterUrl = "http://192.168.1.125:5000"},
                 new {Id = 2, PrinterUrl = "http://192.168.1.125:5000"});
+        }
+        
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer("Server=.;Database=DistancePrinterControl; Trusted_Connection=True; MultipleActiveResultSets=true");
         }
     }
 }
