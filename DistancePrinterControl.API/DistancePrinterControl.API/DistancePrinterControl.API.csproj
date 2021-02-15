@@ -5,6 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Autofac" Version="6.1.0" />
+        <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
         <PackageReference Include="Dapper" Version="2.0.78" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.3" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.3" />
@@ -16,7 +18,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="DTO\" />
+      <ProjectReference Include="..\DistancePrinterControl.Database\DistancePrinterControl.Database.csproj" />
+      <ProjectReference Include="..\DistancePrinterControl.Logic\DistancePrinterControl.Logic.csproj" />
     </ItemGroup>
 
 </Project>
