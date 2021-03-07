@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -9,6 +10,7 @@ using Dapper;
 using DistancePrinterControl.API.Helpers;
 using DistancePrinterControl.Database.Logic.ReadServices.Interfaces;
 using DistancePrinterControl.Database.Models;
+using DistancePrinterControl.Logic.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -63,6 +65,50 @@ namespace DistancePrinterControl.API.Controllers
                 Right = "/right",
                 PrinterId = $@"{printerId}"
             };
+        }
+        
+        [HttpPost("files/{printerId}")]
+        public async Task<object> UploadFile([FromForm] UploadFileDTO uploadData, int printerId) // TODO: Fix this. Learn about multipart forms, and try to implement proxy here.
+        {
+            var printer = _readService.GetPrinter(printerId);
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization
+                    = new AuthenticationHeaderValue("Bearer", $@"{_printerCreds}");
+
+                var multipartContent = new MultipartFormDataContent();
+
+                if (uploadData.File.Length > 0)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        uploadData.File.CopyTo(ms);
+                        var fileBytes = ms.ToArray();
+                        var byteString = Convert.ToBase64String(fileBytes);
+                        multipartContent.Add(new StringContent(byteString), uploadData.Name.ToString());
+                    }
+                }
+            
+
+                var response = await client.PostAsync($"{printer.PrinterUrl}/api/files/local", multipartContent);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                return responseBody;
+            }
+        }
+        
+        [HttpGet("files/{printerId}")]
+        public async Task<object> GetFiles(int printerId) // Seems to be OK, but think about deserialization on client.
+        {
+            var printer = _readService.GetPrinter(printerId);
+            
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", $@"{_printerCreds}");
+
+            var response = await client.GetAsync($"{printer.PrinterUrl}/api/files/local");
+            var responseBody = await response.Content.ReadAsStringAsync();
+            return responseBody;
         }
     }
 }
