@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DistancePrinterControl.Data
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DistancePrinterControl.Logic", "DistancePrinterControl.Logic\DistancePrinterControl.Logic.csproj", "{B2E4AA2E-3B8F-45D6-A1AC-517ABE0B2ED2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DistancePrinterControl.TelegramBot", "DistancePrinterControl.TelegramBot\DistancePrinterControl.TelegramBot.csproj", "{4D024C0B-47F5-4485-8A12-C54F577B0D69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{B2E4AA2E-3B8F-45D6-A1AC-517ABE0B2ED2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2E4AA2E-3B8F-45D6-A1AC-517ABE0B2ED2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2E4AA2E-3B8F-45D6-A1AC-517ABE0B2ED2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D024C0B-47F5-4485-8A12-C54F577B0D69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D024C0B-47F5-4485-8A12-C54F577B0D69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D024C0B-47F5-4485-8A12-C54F577B0D69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D024C0B-47F5-4485-8A12-C54F577B0D69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

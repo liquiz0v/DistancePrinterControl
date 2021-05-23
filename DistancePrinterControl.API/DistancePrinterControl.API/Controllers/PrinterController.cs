@@ -44,7 +44,7 @@ namespace DistancePrinterControl.API.Controllers
         
         [HttpGet("{printerId}/Version")]
         // GET SERVER VERSION
-        public async Task<object> Test(int printerId)
+        public async Task<object> GetServerVersion(int printerId)
         {
             var printer = _readService.GetPrinter(printerId);
             
@@ -55,20 +55,7 @@ namespace DistancePrinterControl.API.Controllers
             string responseBody = await response.Content.ReadAsStringAsync();
             return responseBody;
         }
-        
-        [HttpGet("{printerId}/controls/")]
-        public object Controls(int printerId)
-        {
-            return new
-            {
-                Up = "/up",
-                Down = "/down",
-                Left = "/left",
-                Right = "/right",
-                PrinterId = $@"{printerId}"
-            };
-        }
-        
+
         [HttpPost("{printerId}/files")]
         public async Task<object> UploadFile([FromForm] UploadFileDTO uploadData, int printerId) 
             // TODO: Fix this. Learn about multipart forms, and try to implement proxy here.
