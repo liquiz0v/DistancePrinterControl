@@ -6,6 +6,7 @@ using DistancePrinterControl.Database.Logic.Queries.Interfaces;
 using DistancePrinterControl.Database.Logic.ReadServices;
 using DistancePrinterControl.Database.Logic.ReadServices.Interfaces;
 using DistancePrinterControl.Database.Models;
+using DistancePrinterControl.Database.Models.Interfaces;
 using Microsoft.Extensions.Configuration;
 
 namespace DistancePrinterControl.API.configs
@@ -40,6 +41,7 @@ namespace DistancePrinterControl.API.configs
             builder.RegisterType<ConnectionStringHelper>();
             builder.RegisterType<PrinterQueries>();
             builder.RegisterType<PrinterReadService>();
+            builder.RegisterType<DistancePrinterControlContext>();
             
             return builder;
         }
