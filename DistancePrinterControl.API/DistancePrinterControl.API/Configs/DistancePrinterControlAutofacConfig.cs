@@ -5,6 +5,7 @@ using DistancePrinterControl.Database.Logic.Queries;
 using DistancePrinterControl.Database.Logic.Queries.Interfaces;
 using DistancePrinterControl.Database.Logic.ReadServices;
 using DistancePrinterControl.Database.Logic.ReadServices.Interfaces;
+using DistancePrinterControl.Database.Models;
 using Microsoft.Extensions.Configuration;
 
 namespace DistancePrinterControl.API.configs
@@ -27,6 +28,10 @@ namespace DistancePrinterControl.API.configs
             
             builder.Register(c => new CredsHelper(c.Resolve<IConfiguration>()))
                 .As<ICredsHelper>()
+                .InstancePerLifetimeScope();
+            
+            builder.Register(c => new DistancePrinterControlContext())
+                .As<IDistancePrinterControlContext>()
                 .InstancePerLifetimeScope();
         }
         

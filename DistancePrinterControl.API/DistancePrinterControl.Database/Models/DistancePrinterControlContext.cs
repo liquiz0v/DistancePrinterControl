@@ -1,8 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using DistancePrinterControl.Database.Models.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace DistancePrinterControl.Database.Models
 {
-    public class DistancePrinterControlContext : DbContext
+    public class DistancePrinterControlContext : DbContext, IDistancePrinterControlContext
     {
         public DistancePrinterControlContext() 
         {
@@ -15,6 +19,20 @@ namespace DistancePrinterControl.Database.Models
         }
 
         public DbSet<Printer> Printers { get; set; }
+        
+        public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            return true;
+        }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
