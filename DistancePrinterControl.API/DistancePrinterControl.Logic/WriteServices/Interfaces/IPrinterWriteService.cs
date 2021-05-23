@@ -1,7 +1,10 @@
-﻿namespace DistancePrinterControl.Logic.WriteServices.Interfaces
+﻿using System.Threading.Tasks;
+
+namespace DistancePrinterControl.Logic.WriteServices.Interfaces
 {
-    public class IPrinterWriteService
+    public interface IPrinterWriteService
     {
-        
+        Task<bool> AddPrinter(string printerUrl);
+        Task<bool> RemovePrinter(int printerId);
     }
 }

@@ -34,7 +34,7 @@ namespace DistancePrinterControl.Database.Repository
             return await _context.SaveEntitiesAsync();
         }
 
-        public async Task<bool> AddPrinterById(Printer printer)
+        public async Task<bool> AddPrinter(Printer printer)
         {
             _context.Printers.Add(printer);
             return await _context.SaveEntitiesAsync();

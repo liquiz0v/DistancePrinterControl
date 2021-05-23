@@ -7,6 +7,8 @@ using DistancePrinterControl.Database.Logic.ReadServices;
 using DistancePrinterControl.Database.Logic.ReadServices.Interfaces;
 using DistancePrinterControl.Database.Models;
 using DistancePrinterControl.Database.Models.Interfaces;
+using DistancePrinterControl.Database.Repository;
+using DistancePrinterControl.Database.Repository.Interfaces;
 using Microsoft.Extensions.Configuration;
 
 namespace DistancePrinterControl.API.configs
@@ -34,6 +36,10 @@ namespace DistancePrinterControl.API.configs
             builder.Register(c => new DistancePrinterControlContext())
                 .As<IDistancePrinterControlContext>()
                 .InstancePerLifetimeScope();
+            
+            builder.Register(c => new PrinterRepository(c.Resolve<IDistancePrinterControlContext>()))
+                .As<IPrinterRepository>()
+                .InstancePerLifetimeScope();
         }
         
         public static ContainerBuilder ContainerBuilderConfig(ContainerBuilder builder)
@@ -42,6 +48,7 @@ namespace DistancePrinterControl.API.configs
             builder.RegisterType<PrinterQueries>();
             builder.RegisterType<PrinterReadService>();
             builder.RegisterType<DistancePrinterControlContext>();
+            builder.RegisterType<PrinterRepository>();
             
             return builder;
         }
