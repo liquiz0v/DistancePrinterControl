@@ -57,8 +57,7 @@ namespace DistancePrinterControl.API.Controllers
         }
 
         [HttpPost("{printerId}/files")]
-        public async Task<object> UploadFile([FromForm] UploadFileDTO uploadData, int printerId) 
-            // TODO: Fix this. Learn about multipart forms, and try to implement proxy here.
+        public async Task<object> UploadFile([FromForm] UploadFileDTO uploadData, int printerId)
         {
             var printer = _readService.GetPrinter(printerId);
 
@@ -88,7 +87,7 @@ namespace DistancePrinterControl.API.Controllers
         }
         
         [HttpGet("{printerId}/files")]
-        public async Task<object> GetFiles(int printerId) // Seems to be OK, but think about deserialization on client.
+        public async Task<object> GetFiles(int printerId) 
         {
             var printer = _readService.GetPrinter(printerId);
             

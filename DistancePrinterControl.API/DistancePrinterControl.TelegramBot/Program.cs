@@ -83,6 +83,7 @@ namespace DistancePrinterControl.TelegramBot
                     SendMessageAsync(message, _stringBuilder.ToString());
                     break;
                 
+                //Get current printer task
                 case "/currentjob":
                     _printersCollection = await _requestService.GetPrinters();
                     _printersCollection.ForEach(i => _stringBuilder.Append(i.Id + " "));
@@ -90,6 +91,7 @@ namespace DistancePrinterControl.TelegramBot
                     await SendInlineKeyboard(message, _printersCollection, typeof(JobDTO));
                     break;
 
+                //Get files that's stored on printer
                 case "/getfiles":
                     _printersCollection = await _requestService.GetPrinters();
                     _printersCollection.ForEach(i => _stringBuilder.Append(i.Id + " "));
