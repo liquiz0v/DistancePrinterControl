@@ -42,18 +42,28 @@ namespace DistancePrinterControl.API.Controllers
             return _readService.GetPrinters();
         }
         
-        [HttpGet("{printerId}/Version")]
+        [HttpGet("{printerId}/version")]
         // GET SERVER VERSION
         public async Task<object> GetServerVersion(int printerId)
         {
+            StringBuilder responseBody = new StringBuilder();
             var printer = _readService.GetPrinter(printerId);
+
+            try
+            {
+                HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.Authorization
+                    = new AuthenticationHeaderValue("Bearer", $@"{_printerCreds}");
+                HttpResponseMessage response = await client.GetAsync($"{printer.PrinterUrl}/api/version");
+                responseBody.Append(await response.Content.ReadAsStringAsync());
+                
+            }
+            catch (Exception ex)
+            {
+                responseBody.Append(@$"Connection error to printer {printerId} encountered. Please, contact administrator.");
+            }
             
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization
-                = new AuthenticationHeaderValue("Bearer", $@"{_printerCreds}");
-            HttpResponseMessage response = await client.GetAsync($"{printer.PrinterUrl}/api/version");
-            string responseBody = await response.Content.ReadAsStringAsync();
-            return responseBody;
+            return responseBody.ToString();
         }
 
         [HttpPost("{printerId}/files")]
@@ -99,7 +109,8 @@ namespace DistancePrinterControl.API.Controllers
             var responseBody = await response.Content.ReadAsStringAsync();
             return responseBody;
         }
-
+        
+        // Get current job status
         [HttpGet("{printerId}/job")]
         public async Task<object> JobStatus(int printerId)
         {
@@ -116,6 +127,7 @@ namespace DistancePrinterControl.API.Controllers
         
         [HttpGet("{printerId}/job/{command}")] 
         //TODO: handle 409 CONFLICT when printer is not operational + put available commands into AvailableOptionsEnum
+        // Will be presented on demo, need to mock start action
         public async Task<object> JobIssueCommand(int printerId, string command)
         {
             var printer = _readService.GetPrinter(printerId);
@@ -132,5 +144,20 @@ namespace DistancePrinterControl.API.Controllers
             var responseBody = await response.Content.ReadAsStringAsync();
             return responseBody;
         }
+        
+        [HttpGet("{printerId}/settings")]
+        public async Task<object> GetSettings(int printerId)
+        {
+            var printer = _readService.GetPrinter(printerId);
+            
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", $@"{_printerCreds}");
+            var response = await client.GetAsync($"{printer.PrinterUrl}/api/settings");
+            var responseBody = await response.Content.ReadAsStringAsync();
+            return responseBody;
+        }
+        
+        
     }
 }
