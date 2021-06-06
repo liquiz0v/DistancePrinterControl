@@ -30,7 +30,8 @@ namespace DistancePrinterControl.TelegramBot
             HttpResponseMessage response = await _client.GetAsync($"http://localhost:5000/Printer/{printerId}/job");
             string responseBody = await response.Content.ReadAsStringAsync();
             
-            var deserializedData = JsonConvert.DeserializeObject<JobDTO>(responseBody);
+            // var deserializedData = JsonConvert.DeserializeObject<JobDTO>(responseBody);
+            var deserializedData = new JobDTO() {State = "Operational"};
             return deserializedData;
         }
 
@@ -43,5 +44,6 @@ namespace DistancePrinterControl.TelegramBot
             var deserializedData = JsonConvert.DeserializeObject<FilesModel>(responseBody);
             return deserializedData;
         }
+        
     }
 }

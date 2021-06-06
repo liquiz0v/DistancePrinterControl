@@ -16,6 +16,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
+using File = System.IO.File;
 
 namespace DistancePrinterControl.TelegramBot
 {
@@ -52,7 +53,17 @@ namespace DistancePrinterControl.TelegramBot
         private static async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
             var message = messageEventArgs.Message;
-            if (message == null || message.Type != MessageType.Text)
+            
+
+            if (message.Type == MessageType.Document)
+            {
+                await Bot.SendTextMessageAsync(
+                    chatId: message.Chat.Id,
+                    text: $"{message.Document.FileName}"
+                );
+            }
+            
+            if (message == null)
                 return;
 
             switch (message.Text.Split(' ').First())
@@ -79,8 +90,9 @@ namespace DistancePrinterControl.TelegramBot
                 // Get list of all printers
                 case "/getprinters":
                     _printersCollection = await _requestService.GetPrinters();
-                    _printersCollection.ForEach(i => _stringBuilder.Append(i.Id + " "));
+                    _printersCollection.ForEach(i => _stringBuilder.Append($"Printer with ID {i.Id} is registered;\n"));
                     SendMessageAsync(message, _stringBuilder.ToString());
+                    _stringBuilder.Clear();
                     break;
                 
                 //Get current printer task
@@ -98,18 +110,90 @@ namespace DistancePrinterControl.TelegramBot
                    
                     await SendInlineKeyboard(message, _printersCollection, typeof(FileDTO));
                     break;
+                // case "/uploadfile":
+                //     SendMessageAsync(message, "Choose printer to upload file");
+                //     
+                //     _printersCollection = await _requestService.GetPrinters();
+                //     _printersCollection.ForEach(i => _stringBuilder.Append(i.Id + " "));
+                //    
+                //     await SendInlineKeyboard(message, _printersCollection, typeof(File));
+                //     break;
+                
+                case "/startprint":
+                    var printerIds = new List<string>() { "1", "2" };
+                    var files = new List<FileModelMock>()
+                    {
+                        new FileModelMock() {FileId = "1", FileName = "UMO_bottom_v2.gcode"},
+                    };
+                    
+                    await SendInlineKeyboardFiles(message, files, typeof(FileModelMock));
+                    break;
+                
+                case "/stopprint":
+                    await Bot.SendTextMessageAsync(
+                        chatId: message.Chat.Id,
+                        text: $"Print has successfully stopped!"
+                    );
+                    break;
                 
                 default:
                     await Usage(message);
                     break;
             }
+            
+            static async Task SendInlineKeyboardFiles(Message message, List<FileModelMock> files, Type messageType)
+            {
+                await Bot.SendChatActionAsync(message.Chat.Id, ChatAction.Typing);
+                // Simulate longer running task
+                await Task.Delay(500);
 
+                List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton>();
+                
+                files.ForEach(
+                    _ => keyboardButtons.Add(
+                        InlineKeyboardButton.WithCallbackData(
+                            _.FileName, _.FileId + " " + messageType.ToString()
+                        )
+                    )
+                );
+                
+                var inlineKeyboard = new InlineKeyboardMarkup(keyboardButtons);
+                await Bot.SendTextMessageAsync(
+                    chatId: message.Chat.Id,
+                    text: "Choose file:",
+                    replyMarkup: inlineKeyboard
+                );
+            }
+            
+            static async Task SendInlineKeyboardPrinters(Message message, List<string> printers, Type messageType)
+            {
+                await Bot.SendChatActionAsync(message.Chat.Id, ChatAction.Typing);
+                // Simulate longer running task
+                await Task.Delay(500);
+
+                List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton>();
+                
+                printers.ForEach(
+                    _ => keyboardButtons.Add(
+                        InlineKeyboardButton.WithCallbackData(
+                            _, _ + " " + messageType.ToString()
+                        )
+                    )
+                );
+                
+                var inlineKeyboard = new InlineKeyboardMarkup(keyboardButtons);
+                await Bot.SendTextMessageAsync(
+                    chatId: message.Chat.Id,
+                    text: "Choose printer:",
+                    replyMarkup: inlineKeyboard
+                );
+            }
+            
             // Send inline keyboard
             // You can process responses in BotOnCallbackQueryReceived handler
             static async Task SendInlineKeyboard(Message message, List<PrinterDTO> printerDtos, Type messageType)
             {
                 await Bot.SendChatActionAsync(message.Chat.Id, ChatAction.Typing);
-
                 // Simulate longer running task
                 await Task.Delay(500);
 
@@ -126,7 +210,7 @@ namespace DistancePrinterControl.TelegramBot
                 var inlineKeyboard = new InlineKeyboardMarkup(keyboardButtons);
                 await Bot.SendTextMessageAsync(
                     chatId: message.Chat.Id,
-                    text: "Choose",
+                    text: "Choose printer:",
                     replyMarkup: inlineKeyboard
                 );
             }
@@ -180,11 +264,12 @@ namespace DistancePrinterControl.TelegramBot
 
             static async Task Usage(Message message)
             {
-                const string usage = "Usage:\n" +
-                                     "/inline   - send inline keyboard\n" +
-                                     "/keyboard - send custom keyboard\n" +
-                                     "/photo    - send a photo\n" +
-                                     "/request  - request location or contact";
+                const string usage = @"Usage:
+                                        /getprinters - get available printers;
+                                        /currentjob - get current task;
+                                        /getfiles - get list of uploaded files;
+                                        /startprint - start new printing task;
+                                        /stopprint - stop current printing task;";
                 await Bot.SendTextMessageAsync(
                     chatId: message.Chat.Id,
                     text: usage,
@@ -237,6 +322,21 @@ namespace DistancePrinterControl.TelegramBot
                     chatId: callbackQuery.Message.Chat.Id,
                     text: $"Available memory: {receivedData.Free}, Total memory: {receivedData.Total}"
                 );
+            }
+
+            if (callbackQueryEventArgs.CallbackQuery.Data.Split(' ').Last().Contains("FileModelMock"))
+            {
+                var files = new List<FileModelMock>()
+                {
+                    new FileModelMock() {FileId = "1", FileName = "UMO_bottom_v2.gcode"},
+                };
+                var chosenFileName = callbackQueryEventArgs.CallbackQuery.Data.Split(' ').First();
+                
+                await Bot.SendTextMessageAsync(
+                    chatId: callbackQuery.Message.Chat.Id,
+                    text: $"Chosen file: {files.Find(i => i.FileId == chosenFileName).FileName}\nPrint has started!"
+                );
+                // Bot.GetInfoAndDownloadFileAsync();
             }
 
             // await Bot.AnswerCallbackQueryAsync(

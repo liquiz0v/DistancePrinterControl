@@ -157,7 +157,12 @@ namespace DistancePrinterControl.API.Controllers
             var responseBody = await response.Content.ReadAsStringAsync();
             return responseBody;
         }
-        
-        
+
+        [HttpGet("{printerId}/start/{fileId}")]
+        public async Task<object> StartPrinting(int printerId, int fileId)
+        {
+            var printer = _readService.GetPrinter(printerId);
+            return Ok();
+        }
     }
 }
